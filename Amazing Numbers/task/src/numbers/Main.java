@@ -2,6 +2,129 @@ package numbers;
 
 import java.util.*;
 
+class AmazingNumber {
+
+    public AmazingNumber(long num) {
+        this.value = num;
+
+    }
+
+    public long getValue() {
+        return this.value;
+    }
+
+    public boolean isSquare() {
+        if (this.square != null)
+            return this.square;
+        double sqrt = Math.sqrt(this.value);
+        this.square =  ((sqrt - Math.floor(sqrt)) == 0);
+        return this.square;
+    }
+
+    public boolean isSunny() {
+        if (this.sunny != null)
+            return this.sunny;
+        double sqrt = Math.sqrt(this.value + 1);
+        this.sunny =  ((sqrt - Math.floor(sqrt)) == 0);
+        return this.sunny;
+    }
+
+    public boolean isGapful() {
+        if (this.gapful != null) {
+            return this.gapful;
+        }
+        String str = Long.toString(this.value);
+        if (str.length() < 3)
+            return false;
+        long div = Long.parseLong(str.substring(0, 1) + str.charAt(str.length() - 1));
+        this.gapful = (this.value % div == 0);
+        return this.gapful;
+    }
+
+    public boolean isEven() {
+        if (this.even != null) {
+            return this.even;
+        }
+        this.even =  (this.value % 2 == 0);
+        return this.even;
+    }
+
+    public boolean isOdd() {
+        if (this.odd != null) {
+            return this.odd;
+        }
+        this.odd = !isEven();
+        return this.odd;
+    }
+
+    public boolean isBuzz() {
+        if (this.buzz != null) {
+            return this.buzz;
+        }
+        this.buzz = (this.value % 10 == 7 || this.value % 7 == 0);
+        return this.buzz;
+    }
+
+    public boolean isDuck() {
+        if (this.duck != null) {
+            return this.duck;
+        }
+        String str = String.valueOf(this.value);
+        this.duck = (str.lastIndexOf('0') != -1);
+        return this.duck;
+    }
+
+    public boolean isPalindrome() {
+        if (this.palindromic != null)
+            return this.palindromic;
+        if (this.value < 10)
+            return true;
+        String str = String.valueOf(this.value);
+        int i = 0;
+        int j = str.length() - 1;
+
+        while (str.charAt(i) == str.charAt(j) && i != j && i + 1 != j) {
+            i++;
+            j--;
+        }
+        this.palindromic = (str.charAt(i) == str.charAt(j));
+        return this.palindromic;
+    }
+
+    public boolean isSpy() {
+        if (this.spy != null) {
+            return this.spy;
+        }
+        String str = Long.toString(this.value);
+        String[] strs = str.split("");
+        ArrayList<Long> nums = new ArrayList<>();
+        for (String s : strs) {
+            nums.add(Long.parseLong(s));
+        }
+        long sum = 0;
+        long product = 1;
+        for (Long n : nums) {
+            sum += n;
+            product *= n;
+        }
+        this.spy = (sum == product);
+        return this.spy;
+    }
+
+
+
+    private final Long value;
+    private Boolean even = null;
+    private Boolean odd = null;
+    private Boolean buzz = null;
+    private Boolean duck = null;
+    private Boolean palindromic = null;
+    private Boolean gapful = null;
+    private Boolean spy = null;
+    private Boolean square = null;
+    private Boolean sunny = null;
+}
+
 public class Main {
     final static Scanner scanner = new Scanner(System.in);
 
@@ -17,49 +140,49 @@ public class Main {
             }
             System.out.println();
 
-            Long[] num = new Long[2];
-            num[0] = Long.valueOf(strs[0]);
-            num[1] = (strs.length == 1) ? null : Long.valueOf(strs[1]);
+            AmazingNumber num = new AmazingNumber(Long.parseLong(strs[0]));
+            Long count = (strs.length == 1) ? null : Long.parseLong(strs[1]);
+
             String[] props = (strs.length >= 3) ?
                     Arrays.copyOfRange(strs, 2, strs.length) : null;
-            if (errorCheck(num, props, strs.length)) {
-                if (num[0] == 0){
+            if (errorCheck(num, count, props, strs.length)) {
+                if (num.getValue() == 0){
                     System.out.println("Goodbye!");
                     break;
                 } else if (strs.length == 1) {
-                    printOneNumProps(num[0]);
+                    printOneNumProps(num);
                 } else if (strs.length == 2) {
-                    printMultipleNumProps(num[0], num[1]);
+                    printMultipleNumProps(num, count);
                 }  else if (strs.length == 3) {
-                    printNumsWithProp(num[0], num[1], props[0]);
+                    printNumsWithProp(num, count, props[0]);
                 } else if (strs.length == 4) {
-                    printNumsWithDoubleProps(num[0], num[1], props);
+                    printNumsWithDoubleProps(num, count, props);
                 }
             }
 
         } while (true);
     }
 
-    static boolean errorCheck(Long[] num, String[] props, long length) {
-        if (num[0] < 0) {
+    static boolean errorCheck(AmazingNumber num1, Long num2, String[] props, long length) {
+        if (num1.getValue() < 0) {
             System.out.println("The first parameter should be a natural number or zero.");
             System.out.println();
             return false;
-        } else if (length == 2 && num[1] <= 0) {
+        } else if (length == 2 && num2 <= 0) {
             System.out.println("The second parameter should be a natural number.");
             System.out.println();
             return false;
-        } else if (length == 4 && !isProp(props[0]) && !isProp(props[1])) {
+        } else if (length == 4 && isNotProp(props[0]) && isNotProp(props[1])) {
             System.out.println("The properties [" + props[0].toUpperCase() + ", " + props[1].toUpperCase() + "] are wrong.");
             System.out.println("Available properties: [BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, EVEN, ODD, SQUARE, SUNNY]");
             System.out.println();
             return false;
-        } else if ((length == 3  || length == 4) && !isProp(props[0])) {
+        } else if ((length == 3  || length == 4) && isNotProp(props[0])) {
             System.out.println("The property [" + props[0].toUpperCase() + "] is wrong.");
             System.out.println("Available properties: [BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, EVEN, ODD, SQUARE, SUNNY]");
             System.out.println();
             return false;
-        } else if ((length == 4) && !isProp(props[1])) {
+        } else if ((length == 4) && isNotProp(props[1])) {
             System.out.println("The property [" + props[1].toUpperCase() + "] is wrong.");
             System.out.println("Available properties: [BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, EVEN, ODD, SQUARE, SUNNY]");
             System.out.println();
@@ -84,103 +207,91 @@ public class Main {
                 (prop1.equals("SQUARE") && prop2.equals("SUNNY"));
     }
 
-    static void printNumsWithDoubleProps(long n, long count, String[] props) {
+    static void printNumsWithDoubleProps(AmazingNumber num, long count, String[] props) {
         long fit = 0;
+        long n = num.getValue();
         while (fit != count) {
-            if (hasProp(n, props[0]) && hasProp(n, props[1])) {
-                printPropsLine(n);
+            AmazingNumber temp = new AmazingNumber(n);
+            if (hasProp(temp, props[0]) && hasProp(temp, props[1])) {
+                printPropsLine(temp);
                 fit++;
             }
             n++;
         }
     }
 
-    static boolean hasProp(long n, String prop) {
-        return (prop.equalsIgnoreCase("even") && isEven(n)) ||
-                (prop.equalsIgnoreCase("odd") && !isEven(n)) ||
-                (prop.equalsIgnoreCase("buzz") && isBuzz(n)) ||
-                (prop.equalsIgnoreCase("duck") && isDuck(n)) ||
-                (prop.equalsIgnoreCase("palindromic") && isPalindrome(n)) ||
-                (prop.equalsIgnoreCase("gapful") && isGapful(n)) ||
-                (prop.equalsIgnoreCase("spy") && isSpy(n)) ||
-                (prop.equalsIgnoreCase("square") && isSquare(n)) ||
-                (prop.equalsIgnoreCase("sunny") && isSunny(n));
+    static boolean hasProp(AmazingNumber n, String prop) {
+        return (prop.equalsIgnoreCase("even") && n.isEven()) ||
+                (prop.equalsIgnoreCase("odd") && n.isOdd()) ||
+                (prop.equalsIgnoreCase("buzz") && n.isBuzz()) ||
+                (prop.equalsIgnoreCase("duck") && n.isDuck()) ||
+                (prop.equalsIgnoreCase("palindromic") && n.isPalindrome()) ||
+                (prop.equalsIgnoreCase("gapful") && n.isGapful()) ||
+                (prop.equalsIgnoreCase("spy") && n.isSpy()) ||
+                (prop.equalsIgnoreCase("square") && n.isSquare()) ||
+                (prop.equalsIgnoreCase("sunny") && n.isSunny());
     }
 
-    static void printNumsWithProp(long n, long count, String prop) {
+    static void printNumsWithProp(AmazingNumber num, long count, String prop) {
         long fit = 0;
+        long n = num.getValue();
         while (fit != count) {
-            if (hasProp(n, prop)) {
-                printPropsLine(n);
+            AmazingNumber temp = new AmazingNumber(n);
+            if (hasProp(temp, prop)) {
+                printPropsLine(temp);
                 fit++;
             }
             n++;
         }
     }
 
-    static boolean isSpy(long num) {
-        String str = Long.toString(num);
-        String[] strs = str.split("");
-        ArrayList<Long> nums = new ArrayList<>();
-        for (String s : strs) {
-            nums.add(Long.parseLong(s));
-        }
-        long sum = 0;
-        long product = 1;
-        for (Long n : nums) {
-            sum += n;
-            product *= n;
-        }
-        return sum == product;
-    }
-
-    static boolean isProp(String prop) {
+    static boolean isNotProp(String prop) {
         if (prop == null)
-            return false;
-        return prop.equalsIgnoreCase("even") ||
-                prop.equalsIgnoreCase("odd") ||
-                prop.equalsIgnoreCase("buzz") ||
-                prop.equalsIgnoreCase("duck") ||
-                prop.equalsIgnoreCase("palindromic") ||
-                prop.equalsIgnoreCase("gapful") ||
-                prop.equalsIgnoreCase("spy") ||
-                prop.equalsIgnoreCase("square") ||
-                prop.equalsIgnoreCase("sunny");
+            return true;
+        return !prop.equalsIgnoreCase("even") &&
+                !prop.equalsIgnoreCase("odd") &&
+                !prop.equalsIgnoreCase("buzz") &&
+                !prop.equalsIgnoreCase("duck") &&
+                !prop.equalsIgnoreCase("palindromic") &&
+                !prop.equalsIgnoreCase("gapful") &&
+                !prop.equalsIgnoreCase("spy") &&
+                !prop.equalsIgnoreCase("square") &&
+                !prop.equalsIgnoreCase("sunny");
     }
 
     static String[] getInput() {
         return scanner.nextLine().split(" ", 0);
     }
 
-    static void printPropsLine(long num) {
-        System.out.println(num + " is" +
-                (isEven(num) ? " even" : " odd") +
-                (isBuzz(num) ? ", buzz" : "") +
-                (isDuck(num) ? ", duck" : "") +
-                (isPalindrome(num) ? ", palindromic" : "") +
-                (isGapful(num) ? ", gapful" : "") +
-                (isSpy(num) ? ", spy" : "") +
-                (isSquare(num) ? ", square" : "") +
-                (isSunny(num) ? ", sunny" : ""));
+    static void printPropsLine(AmazingNumber num) {
+        System.out.println(num.getValue() + " is" +
+                (num.isEven() ? " even" : " odd") +
+                (num.isBuzz() ? ", buzz" : "") +
+                (num.isDuck() ? ", duck" : "") +
+                (num.isPalindrome() ? ", palindromic" : "") +
+                (num.isGapful() ? ", gapful" : "") +
+                (num.isSpy() ? ", spy" : "") +
+                (num.isSquare() ? ", square" : "") +
+                (num.isSunny() ? ", sunny" : ""));
     }
 
-    static void printMultipleNumProps(long num, long num2) {
+    static void printMultipleNumProps(AmazingNumber num, long num2) {
         for (long i = 0; i < num2; i++) {
-            printPropsLine(num + i);
+            printPropsLine( new AmazingNumber(num.getValue() + i));
         }
     }
 
-    static void printOneNumProps(long num) {
-        printPropsOf(num);
-        System.out.println("\teven: " + ((isEven(num)) ? "true" : "false"));
-        System.out.println("\todd: " + ((isEven(num)) ? "false" : "true"));
-        System.out.println("\tbuzz: " + ((isBuzz(num)) ? "true" : "false"));
-        System.out.println("\tduck: " + ((isDuck(num)) ? "true" : "false"));
-        System.out.println("\tpalindromic: " + ((isPalindrome(num)) ? "true" : "false"));
-        System.out.println("\tgapful: " + ((isGapful(num)) ? "true" : "false"));
-        System.out.println("\tspy: " + ((isSpy(num)) ? "true" : "false"));
-        System.out.println("\tsquare: " + ((isSquare(num)) ? "true" : "false"));
-        System.out.println("\tsunny: " + ((isSunny(num)) ? "true" : "false"));
+    static void printOneNumProps(AmazingNumber num) {
+        printPropsOf(num.getValue());
+        System.out.println("\teven: " + num.isEven());
+        System.out.println("\todd: " + num.isOdd());
+        System.out.println("\tbuzz: " + num.isBuzz());
+        System.out.println("\tduck: " + num.isDuck());
+        System.out.println("\tpalindromic: " + num.isPalindrome());
+        System.out.println("\tgapful: " + num.isGapful());
+        System.out.println("\tspy: " + num.isSpy());
+        System.out.println("\tsquare: " + num.isSquare());
+        System.out.println("\tsunny: " + num.isSunny());
         System.out.println();
     }
 
@@ -208,49 +319,5 @@ public class Main {
         System.out.println("Welcome to Amazing Numbers!");
         System.out.println();
         printInstruction();
-    }
-
-    static boolean isSquare(long num) {
-        double sqrt = Math.sqrt(num);
-        return ((sqrt - Math.floor(sqrt)) == 0);
-    }
-
-    static boolean isSunny(long num) {
-        return isSquare(num + 1);
-    }
-
-    static boolean isGapful(long num) {
-        String str = Long.toString(num);
-        if (str.length() < 3)
-            return false;
-        long div = Long.parseLong(str.substring(0, 1) + str.charAt(str.length() - 1));
-        return num % div == 0;
-    }
-
-    static boolean isEven(long num) {
-        return num % 2 == 0;
-    }
-
-    static boolean isBuzz(long num) {
-        return num % 10 == 7 || num % 7 == 0;
-    }
-
-    static boolean isDuck(long num) {
-        String str = String.valueOf(num);
-        return str.lastIndexOf('0') != -1;
-    }
-
-    static boolean isPalindrome(long num) {
-        if (num < 10)
-            return true;
-        String str = String.valueOf(num);
-        int i = 0;
-        int j = str.length() - 1;
-
-        while (str.charAt(i) == str.charAt(j) && i != j && i + 1 != j) {
-            i++;
-            j--;
-        }
-        return str.charAt(i) == str.charAt(j);
     }
 }
